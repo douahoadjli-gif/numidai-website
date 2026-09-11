@@ -2,7 +2,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { formSteps, formCopy } from '../data/startProjectForm.js';
 import { FieldShell, TextInput, RadioChips, CheckChips, Progress } from '../components/ui.jsx';
-import { submitProject, DEMO_MODE } from '../lib/supabase.js';
+import { submitProject } from '../lib/api.js';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -118,7 +118,6 @@ export default function StartProject({ lang }) {
             <p className="sp-ref">
               {copy.successRef}
               <b>{result.project_code}</b>
-              {result.demo && <span className="sp-demo-tag">demo</span>}
             </p>
           )}
           <a className="btn btn--primary" href="#home" onClick={() => setTimeout(() => location.reload(), 50)}>
@@ -135,9 +134,6 @@ export default function StartProject({ lang }) {
         <p className="eyebrow">{copy.kicker}</p>
         <h1 className="sp-title">{copy.title}</h1>
         <p className="sp-intro">{copy.intro}</p>
-        {DEMO_MODE && (
-          <p className="sp-demo-note">Demo mode — submissions are simulated until Supabase is configured.</p>
-        )}
       </header>
 
       <Progress steps={steps} current={step} lang={lang} />

@@ -1,9 +1,10 @@
-/* NumidAI · Admin Dashboard (foundation)
-   Architecture + reusable components for the internal team console.
-   Production: gate behind Supabase Auth (RLS already restricts data to
-   authenticated users). Demo mode shows sample data. */
+/* NumidAI · Admin Dashboard
+   Real project data from MongoDB via api/projects/*. Gated by the
+   App.jsx route guard (#/admin requires a valid session from
+   /api/login); the list/status-update endpoints themselves also
+   independently require that session server-side. */
 import { useEffect, useMemo, useState } from 'react';
-import { listProjects, updateProjectStatus, DEMO_MODE } from '../lib/supabase.js';
+import { listProjects, updateProjectStatus } from '../lib/api.js';
 
 export const PIPELINE = [
   ['new_request', 'New Request'],
@@ -105,12 +106,6 @@ export default function AdminDashboard() {
         </form>
       </header>
 
-      {DEMO_MODE && (
-        <p className="sp-demo-note">
-          Demo mode — sample data. In production this console requires a Supabase Auth session
-          (RLS grants table access to authenticated team members only).
-        </p>
-      )}
       {error && <p className="f-error" role="alert">{error}</p>}
 
       <div className="adm-table" role="table">
