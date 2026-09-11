@@ -9,8 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "gsap": "^3.12.5",
+    "jsonwebtoken": "^9.0.3",
     "lenis": "^1.1.14",
+    "mongodb": "^7.6.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

@@ -3,8 +3,32 @@ import { content } from './data/content.js';
 import { setupMotion, teardownMotion } from './motion.js';
 import StartProject from './views/StartProject.jsx';
 import AdminDashboard from './views/AdminDashboard.jsx';
+import Login from './views/Login.jsx';
 
-/* Dependency-free hash router: '#/start' and '#/admin' are views;
+/* Checks the httpOnly session cookie via /api/me. Returns null while
+   loading, then true/false. Re-checked whenever the route changes to
+   'admin' or 'login' so a fresh login is picked up without a full reload. */
+function useAuth(route) {
+  const [authed, setAuthed] = useState(null);
+  useEffect(() => {
+    if (route !== 'admin' && route !== 'login') return;
+    let cancelled = false;
+    fetch('/api/me')
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled) setAuthed(!!d.authenticated);
+      })
+      .catch(() => {
+        if (!cancelled) setAuthed(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [route]);
+  return [authed, setAuthed];
+}
+
+/* Dependency-free hash router: '#/start', '#/admin', '#/login' are views;
    every other hash (e.g. '#platform') is an in-page anchor on the landing. */
 function useHashRoute() {
   const parse = () =>
@@ -449,6 +473,7 @@ function BackgroundLayer() {
 export default function App() {
   const [lang, setLang] = useLanguage();
   const route = useHashRoute();
+  const [authed, setAuthed] = useAuth(route);
   const t = content[lang];
 
   useEffect(() => {
@@ -468,9 +493,28 @@ export default function App() {
             <StartProject lang={lang} />
           </main>
         )}
+        {route === 'login' && (
+          <main>
+            {authed ? (
+              <p style={{ textAlign: 'center', paddingTop: '4rem' }}>
+                Already signed in — <a href="#/admin">go to dashboard</a>.
+              </p>
+            ) : (
+              <Login onSuccess={() => { setAuthed(true); location.hash = '#/admin'; }} />
+            )}
+          </main>
+        )}
         {route === 'admin' && (
           <main>
-            <AdminDashboard />
+            {authed === null && (
+              <p style={{ textAlign: 'center', paddingTop: '4rem' }}>Checking session…</p>
+            )}
+            {authed === false && (
+              <p style={{ textAlign: 'center', paddingTop: '4rem' }}>
+                Please <a href="#/login">sign in</a> to view the admin dashboard.
+              </p>
+            )}
+            {authed === true && <AdminDashboard />}
           </main>
         )}
         {route === 'home' && (
