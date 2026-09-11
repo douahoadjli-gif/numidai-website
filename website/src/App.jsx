@@ -80,9 +80,6 @@ function Header({ t, lang, setLang, solid }) {
           >
             {lang === 'en' ? 'AR' : 'EN'}
           </button>
-          <a href="#cta" className="btn btn--ghost">
-            {t.nav.login}
-          </a>
           <a href="#cta" className="btn btn--primary">
             {t.nav.demo}
           </a>
